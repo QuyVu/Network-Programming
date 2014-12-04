@@ -90,7 +90,7 @@ static BOOLEAN on_signup(int sock, const char *name, const char *password) {
             SEND(1, create_contents(1, Message[SERVER_LOGIN_SUCCESS]));
             notify_listuser();
         } else {
-            SEND(2, create_contents(2, Message[SERVER_SIGNUP_FAILURE], "Cannot signup"));
+            SEND(1, create_contents(1, Message[SERVER_SIGNUP_FAILURE]));
         }
         return res;
     }

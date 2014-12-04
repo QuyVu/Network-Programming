@@ -117,7 +117,7 @@
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="buttonLoginLogout" min="-2" pref="76" max="-2" attributes="0"/>
+                  <Component id="buttonLogin" min="-2" pref="76" max="-2" attributes="0"/>
                   <EmptySpace min="-2" pref="36" max="-2" attributes="0"/>
                   <Component id="buttonSignup" min="-2" pref="76" max="-2" attributes="0"/>
                   <EmptySpace max="32767" attributes="0"/>
@@ -127,24 +127,26 @@
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="buttonLoginLogout" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="buttonLogin" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="buttonSignup" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
       </Layout>
       <SubComponents>
-        <Component class="javax.swing.JButton" name="buttonLoginLogout">
+        <Component class="javax.swing.JButton" name="buttonLogin">
           <Properties>
             <Property name="text" type="java.lang.String" value="Login"/>
+            <Property name="enabled" type="boolean" value="false"/>
           </Properties>
           <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttonLoginLogoutActionPerformed"/>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttonLoginActionPerformed"/>
           </Events>
         </Component>
         <Component class="javax.swing.JButton" name="buttonSignup">
           <Properties>
             <Property name="text" type="java.lang.String" value="Signup"/>
+            <Property name="enabled" type="boolean" value="false"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttonSignupActionPerformed"/>

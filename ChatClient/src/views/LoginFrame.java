@@ -8,11 +8,31 @@ import main.Client;
 public class LoginFrame extends javax.swing.JFrame {
 
     private boolean isLogin = false;
-    public static Client client;
-    public static Thread thread;
+    public Client client;
+    public Thread thread;
+    public String logedUser;
 
     public LoginFrame() {
         initComponents();
+        client = new Client();
+        if (client.connect("localhost", 6000)) {
+            buttonLogin.setEnabled(true);
+            buttonSignup.setEnabled(true);
+        } else {
+            displayNotification(Color.red, "Cannot connect to localhost port 6000");
+        }
+        client.onSignupSuccess((params) -> {
+            signupSuccess();
+        });
+        client.onSignupFailure((params) -> {
+            signupFailure();
+        });
+        client.onLoginSuccess((params) -> {
+            loginSuccess(params);
+        });
+        client.onLoginFailure((params) -> {
+            loginFailure(params);
+        });
     }
 
     /**
@@ -30,7 +50,7 @@ public class LoginFrame extends javax.swing.JFrame {
         jLabel4 = new javax.swing.JLabel();
         textPassword = new javax.swing.JPasswordField();
         jPanel5 = new javax.swing.JPanel();
-        buttonLoginLogout = new javax.swing.JButton();
+        buttonLogin = new javax.swing.JButton();
         buttonSignup = new javax.swing.JButton();
         labelNotification = new javax.swing.JLabel();
 
@@ -73,14 +93,16 @@ public class LoginFrame extends javax.swing.JFrame {
                     .addComponent(textPassword, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
         );
 
-        buttonLoginLogout.setText("Login");
-        buttonLoginLogout.addActionListener(new java.awt.event.ActionListener() {
+        buttonLogin.setText("Login");
+        buttonLogin.setEnabled(false);
+        buttonLogin.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                buttonLoginLogoutActionPerformed(evt);
+                buttonLoginActionPerformed(evt);
             }
         });
 
         buttonSignup.setText("Signup");
+        buttonSignup.setEnabled(false);
         buttonSignup.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 buttonSignupActionPerformed(evt);
@@ -93,7 +115,7 @@ public class LoginFrame extends javax.swing.JFrame {
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel5Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(buttonLoginLogout, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(buttonLogin, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(36, 36, 36)
                 .addComponent(buttonSignup, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -101,7 +123,7 @@ public class LoginFrame extends javax.swing.JFrame {
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                .addComponent(buttonLoginLogout)
+                .addComponent(buttonLogin)
                 .addComponent(buttonSignup))
         );
 
@@ -135,34 +157,36 @@ public class LoginFrame extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void buttonLoginLogoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonLoginLogoutActionPerformed
-        client = new Client();
+    private void buttonLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonLoginActionPerformed
         if (!isLogin) {
-            if (client.connect("localhost", 6000)) {
-                thread = new Thread(client);
-                thread.start();
-                super.dispose();
-                ChatFrame.main();
-            } else {
-                displayNotification(Color.red, "Cannot connect to localhost port 6000");
-            }
             client.login(textUsername.getText(), new String(textPassword.getPassword()));
+            logedUser = textUsername.getText();
         }
-    }//GEN-LAST:event_buttonLoginLogoutActionPerformed
+    }//GEN-LAST:event_buttonLoginActionPerformed
 
     private void buttonSignupActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonSignupActionPerformed
         client.signup(textUsername.getText(), new String(textPassword.getPassword()));
+        logedUser = textUsername.getText();
     }//GEN-LAST:event_buttonSignupActionPerformed
 
-    private void signupSuccess() {
-        buttonSignup.setEnabled(false);
-        buttonLoginLogout.setText("Logout");
-        textUsername.setEnabled(false);
-        textPassword.setEnabled(false);
+    private void loginSuccess(String[] params) {
+        thread = new Thread(client);
+        thread.start();
+        super.dispose();
+        new ChatFrame().showChat(this);
+        isLogin = true;
     }
 
-    private void signupFailure(String[] params) {
+    private void loginFailure(String[] params) {
         displayNotification(Color.red, params[0]);
+    }
+
+    private void signupSuccess() {
+        displayNotification(Color.red, "Signup Successful");
+    }
+
+    private void signupFailure() {
+        displayNotification(Color.red, "Cannot Signup");
     }
 
     private void displayNotification(Color color, String notification) {
@@ -173,10 +197,7 @@ public class LoginFrame extends javax.swing.JFrame {
         }).start();
     }
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
+    public void showLogin() {
         try {
             javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
@@ -190,7 +211,7 @@ public class LoginFrame extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton buttonLoginLogout;
+    private javax.swing.JButton buttonLogin;
     private javax.swing.JButton buttonSignup;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel4;
