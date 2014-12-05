@@ -21,9 +21,20 @@ public class ChatFrame extends JFrame {
     /**
      * Creates new form ChatFrame
      */
-    public ChatFrame() {
+    public ChatFrame(LoginFrame loginFrame) {
         initComponents();
-
+        this.loginFrame = loginFrame;
+        client = loginFrame.client;
+        thread = loginFrame.thread;
+        client.onLogoutSuccess((params) -> {
+            logoutSuccess();
+        });
+        client.onReceive((params) -> {
+            receive(params);
+        });
+        client.onInfoListuser((params) -> {
+            infoListuser(params);
+        });
         this.addWindowListener(new WindowListener() {
 
             @Override
@@ -246,27 +257,15 @@ public class ChatFrame extends JFrame {
         }).start();
     }
 
-    public void showChat(LoginFrame loginFrame) {
+    public void showChat() {
         try {
             javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
         }
-        this.loginFrame = loginFrame;
-        client = loginFrame.client;
-        thread = loginFrame.thread;
-        client.onLogoutSuccess((params) -> {
-            logoutSuccess();
-        });
-        client.onReceive((params) -> {
-            receive(params);
-        });
-        client.onInfoListuser((params) -> {
-            infoListuser(params);
-        });
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> {
-            new ChatFrame().setVisible(true);
+            this.setVisible(true);
         });
     }
 

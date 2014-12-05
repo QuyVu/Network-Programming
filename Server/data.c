@@ -8,13 +8,12 @@ static void init();
 
 BOOLEAN data_open() {
     int rc;
-    rc = sqlite3_open(DATA_FILEPATH, &chat_database);
+    rc = sqlite3_open(DATA_PATH, &chat_database);
 
     if (rc) {
-        printf(TEXT_ERROR "Can't open database: %s\n", sqlite3_errmsg(chat_database));
+        printf(TEXT_ERROR "Can not open database: %s\n", sqlite3_errmsg(chat_database));
         return FALSE;
     } else {
-        //printf(SUCCESS "Opened database successfully\n");
         init();
         return TRUE;
     }
@@ -33,7 +32,6 @@ BOOLEAN data_add_user(const char *name, const char *password) {
         sqlite3_free(message);
         return FALSE;
     } else {
-        //printf(SUCCESS "Records created successfully\n");
         return TRUE;
     }
 }

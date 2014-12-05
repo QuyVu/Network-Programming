@@ -19,7 +19,7 @@ public class LoginFrame extends javax.swing.JFrame {
             buttonLogin.setEnabled(true);
             buttonSignup.setEnabled(true);
         } else {
-            displayNotification(Color.red, "Cannot connect to localhost port 6000");
+            displayNotification(Color.red, "Cannot connect to server");
         }
         client.onSignupSuccess((params) -> {
             signupSuccess();
@@ -160,20 +160,17 @@ public class LoginFrame extends javax.swing.JFrame {
     private void buttonLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonLoginActionPerformed
         if (!isLogin) {
             client.login(textUsername.getText(), new String(textPassword.getPassword()));
-            logedUser = textUsername.getText();
         }
     }//GEN-LAST:event_buttonLoginActionPerformed
 
     private void buttonSignupActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonSignupActionPerformed
         client.signup(textUsername.getText(), new String(textPassword.getPassword()));
-        logedUser = textUsername.getText();
     }//GEN-LAST:event_buttonSignupActionPerformed
 
     private void loginSuccess(String[] params) {
-        thread = new Thread(client);
-        thread.start();
+        logedUser = textUsername.getText();
         super.dispose();
-        new ChatFrame().showChat(this);
+        new ChatFrame(this).showChat();
         isLogin = true;
     }
 
@@ -202,11 +199,11 @@ public class LoginFrame extends javax.swing.JFrame {
             javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
         }
+        thread = new Thread(client);
+        thread.start();
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new LoginFrame().setVisible(true);
-            }
+        java.awt.EventQueue.invokeLater(() -> {
+            this.setVisible(true);
         });
     }
 

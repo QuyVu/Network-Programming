@@ -7,7 +7,7 @@ extern "C" {
     
 #include <sqlite3.h>
     
-#define DATA_FILEPATH       "res/chat.db"
+#define DATA_PATH       "database/chat.db"
 #define DATA_SQL_LENGTH     100
 
 sqlite3 *chat_database;
