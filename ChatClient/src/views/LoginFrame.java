@@ -171,7 +171,6 @@ public class LoginFrame extends javax.swing.JFrame {
         logedUser = textUsername.getText();
         super.dispose();
         new ChatFrame(this).showChat();
-        isLogin = true;
     }
 
     private void loginFailure(String[] params) {
