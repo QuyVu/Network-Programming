@@ -146,7 +146,7 @@ public class ChatFrame extends JFrame {
         textMessage.setRows(5);
         jScrollPane3.setViewportView(textMessage);
 
-        labelNotification.setText("Notification");
+        labelNotification.setText(" ");
         labelNotification.setMaximumSize(new java.awt.Dimension(500, 17));
 
         buttonSend.setText("Send");
@@ -251,12 +251,15 @@ public class ChatFrame extends JFrame {
         );
 
         pack();
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void buttonSendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonSendActionPerformed
-        client.send(loginFrame.logedUser, listUser.getSelectedValue().toString(),
-                textMessage.getText());
-        textMessage.setText(" ");
+        if (listUser.getSelectedValue() != null) {
+            client.send(loginFrame.logedUser, listUser.getSelectedValue().toString(),
+                    textMessage.getText());
+            textMessage.setText(" ");
+        } else labelNotification.setText("You must chose some one first!");
     }//GEN-LAST:event_buttonSendActionPerformed
 
     private void buttonLogoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonLogoutActionPerformed

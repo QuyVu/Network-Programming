@@ -9,7 +9,7 @@ public class Message {
     private final JSONArray message;
 
     @SuppressWarnings("unchecked")
-    public Message(Client type, String... contents) {
+    public Message(EClient type, String... contents) {
         message = new JSONArray();
         message.add(type.toString());
         message.addAll(Arrays.asList(contents));
@@ -20,7 +20,7 @@ public class Message {
         return message.toJSONString();
     }
 
-    public enum Client {
+    public enum EClient {
 
         SIGNUP,
         LOGIN,

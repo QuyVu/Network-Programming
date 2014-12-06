@@ -75,7 +75,6 @@ static void* thread_proc(void *arg) {
 /*
  * Client action handler
  */
-
 static BOOLEAN on_signup(int sock, const char *name, const char *password) {
     char buffer[SERVER_BUFFER_LENGTH];
     if (data_get_password(name) != NULL) {
@@ -187,30 +186,19 @@ static char** create_contents(int fields, ...) {
     return contents;
 }
 
-/**
- * main function
- */
-
 int main(int argc, char *argv[]) {
-
+    int port = 6000;
     int val = 1;
     int result;
     int listenfd;
+    printf(TEXT_SUCCESS "Server Init Successful\n" TEXT_NORMAL);
     listenfd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     result = setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR, &val, sizeof (val));
     if (result < 0) {
         printf(TEXT_ERROR "Cannot set socket options\n" TEXT_NORMAL);
         exit(EXIT_FAILURE);
     }
-
-    int port;
-    if (argc < 2) {
-        port = 6000;
-        printf(TEXT_WARNING "No port provided. Set 6000 as default\n" TEXT_NORMAL);
-    } else {
-        port = atoi(argv[1]);
-    }
-
+       
     struct sockaddr_in sevraddr;
     sevraddr.sin_family = AF_INET;
     sevraddr.sin_port = htons(port);
@@ -230,7 +218,7 @@ int main(int argc, char *argv[]) {
 
     data_open();
     clients = tree_make();
-
+    
     int i;
     pthread_t thread_id;
     for (i = 0; i < SERVER_MAX_CONNECTION; i++) {
@@ -241,6 +229,5 @@ int main(int argc, char *argv[]) {
         }
         sched_yield();
     }
-
     pthread_join(thread_id, NULL);
 }

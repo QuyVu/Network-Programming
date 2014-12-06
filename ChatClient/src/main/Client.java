@@ -71,23 +71,23 @@ public final class Client implements Runnable {
      Public method
      */
     public boolean signup(String username, String password) {
-        return send(new Message(Message.Client.SIGNUP, username, password));
+        return send(new Message(Message.EClient.SIGNUP, username, password));
     }
 
     public boolean login(String username, String password) {
-        return send(new Message(Message.Client.LOGIN, username, password));
+        return send(new Message(Message.EClient.LOGIN, username, password));
     }
 
     public boolean logout(String username) {
-        return send(new Message(Message.Client.LOGOUT, username));
+        return send(new Message(Message.EClient.LOGOUT, username));
     }
 
     public boolean send(String sender, String recipient, String message) {
-        return send(new Message(Message.Client.SEND, sender, recipient, message));
+        return send(new Message(Message.EClient.SEND, sender, recipient, message));
     }
 
     public boolean quit() {
-        return send(new Message(Message.Client.QUIT));
+        return send(new Message(Message.EClient.QUIT));
     }
 
     public boolean connect(String host, int port) {
@@ -199,7 +199,6 @@ public final class Client implements Runnable {
         NORMAL("\u001B[0m"),
         ERROR("\u001B[31m"),
         SUCCESS("\u001B[32m"),
-        WARNING("\u001B[33m"),
         INFO("\u001B[34m");
 
         private final String text;
