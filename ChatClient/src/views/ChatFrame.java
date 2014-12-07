@@ -6,7 +6,6 @@ import java.awt.event.WindowListener;
 import javax.swing.DefaultListModel;
 import javax.swing.JFrame;
 import javax.swing.Timer;
-import javax.swing.UnsupportedLookAndFeelException;
 import main.Client;
 
 public class ChatFrame extends JFrame {
@@ -14,20 +13,21 @@ public class ChatFrame extends JFrame {
     private final LoginFrame loginFrame;
     private Client client;
     private Thread thread;
-    private DefaultListModel<String> modelUser;
+    private DefaultListModel<String> modelUser; //use for updating list of user
 
     private boolean isLogin = false;
 
-    /*
-     * Creates new form ChatFrame
-     */
     public ChatFrame(LoginFrame loginFrame) {
         initComponents();
+        
+        //get info of user just loged in
         this.loginFrame = loginFrame;
         client = loginFrame.client;
         thread = loginFrame.thread;
         String labelName = "You are logging in as " + loginFrame.logedUser;
         labelUserName.setText(labelName);
+        
+        //event handler
         client.onLogoutSuccess((params) -> {
             logoutSuccess();
         });
@@ -52,7 +52,6 @@ public class ChatFrame extends JFrame {
                 if (thread != null) {
                     thread.interrupt();
                 }
-                //client.close(); // TODO close socket here
             }
 
             @Override
@@ -254,6 +253,7 @@ public class ChatFrame extends JFrame {
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
+    //handle send button click
     private void buttonSendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonSendActionPerformed
         if (listUser.getSelectedValue() != null) {
             client.send(loginFrame.logedUser, listUser.getSelectedValue().toString(),
@@ -262,20 +262,24 @@ public class ChatFrame extends JFrame {
         } else labelNotification.setText("You must chose some one first!");
     }//GEN-LAST:event_buttonSendActionPerformed
 
+    //handle log out button click
     private void buttonLogoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonLogoutActionPerformed
         client.logout(loginFrame.logedUser);
         super.dispose();
         loginFrame.setVisible(true);
     }//GEN-LAST:event_buttonLogoutActionPerformed
-
+    
+    //when server return LOGOUT_SUCCESS
     private void logoutSuccess() {
         isLogin = false;
     }
-
+    
+    //print message received
     private void receive(String[] params) {
         textChat.append(params[0] + ": " + params[2] + "\n");
     }
-
+    
+    //get list of users that you can chat with
     private void infoListuser(String[] params) {
         modelUser.clear();
         for (String param : params) {
@@ -285,9 +289,7 @@ public class ChatFrame extends JFrame {
         }
     }
 
-    /*
-     Others
-     */
+    //Template for labelNotification
     private void displayNotification(Color color, String notification) {
         labelNotification.setText(notification);
         labelNotification.setForeground(color);
@@ -297,11 +299,6 @@ public class ChatFrame extends JFrame {
     }
 
     public void showChat() {
-        /*try {
-            javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
-        }*/
-
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> {
             this.setVisible(true);

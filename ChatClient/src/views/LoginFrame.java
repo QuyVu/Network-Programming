@@ -15,12 +15,15 @@ public class LoginFrame extends javax.swing.JFrame {
     public LoginFrame() {
         initComponents();
         client = new Client();
+        //connect automatically
         if (client.connect("localhost", 6000)) {
             buttonLogin.setEnabled(true);
             buttonSignup.setEnabled(true);
         } else {
             displayNotification(Color.red, "Cannot connect to server");
         }
+        
+        //event handler
         client.onSignupSuccess((params) -> {
             signupSuccess();
         });
@@ -163,48 +166,50 @@ public class LoginFrame extends javax.swing.JFrame {
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
+    //handle login button click
     private void buttonLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonLoginActionPerformed
         if (!isLogin) {
             client.login(textUsername.getText(), new String(textPassword.getPassword()));
         }
     }//GEN-LAST:event_buttonLoginActionPerformed
 
+    //handle sign up button click
     private void buttonSignupActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonSignupActionPerformed
         client.signup(textUsername.getText(), new String(textPassword.getPassword()));
     }//GEN-LAST:event_buttonSignupActionPerformed
-
+    
+    //when server return LOGIN_SUCCESS
     private void loginSuccess(String[] params) {
         logedUser = textUsername.getText();
         super.dispose();
         new ChatFrame(this).showChat();
     }
 
+    //when server return LOGIN_FAILURE
     private void loginFailure(String[] params) {
         displayNotification(Color.red, params[0]);
     }
 
+    //when server return SIGNUP_SUCCESS
     private void signupSuccess() {
         displayNotification(Color.red, "Signup Successful");
     }
-
+    
+    //when server return SIGNUP_FAILURE
     private void signupFailure() {
-        displayNotification(Color.red, "Cannot Signup");
+        displayNotification(Color.red, "Name already exist");
     }
 
+    //template for nitification label
     private void displayNotification(Color color, String notification) {
         labelNotification.setText(notification);
         labelNotification.setForeground(color);
-        new Timer(5000, (event) -> {
+        new Timer(3000, (event) -> {
             labelNotification.setText(" ");
         }).start();
     }
-
+    
     public void showLogin() {
-        /*
-        try {
-            javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.);
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
-        }*/
         thread = new Thread(client);
         thread.start();
         /* Create and display the form */

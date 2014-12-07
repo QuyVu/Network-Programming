@@ -17,6 +17,9 @@ public final class Client implements Runnable {
     private Socket socket;
     private final int CLIENT_BUFFER_LENGTH = 100;
 
+    /*
+     Handler for client action
+    */
     private Consumer<String[]> signupSuccess;
     private Consumer<String[]> signupFailure;
     private Consumer<String[]> loginSuccess;
@@ -29,7 +32,6 @@ public final class Client implements Runnable {
      Constructor
      */
     public Client() {
-
     }
 
     public Client(String host, int port) {
@@ -68,7 +70,7 @@ public final class Client implements Runnable {
     }
 
     /*
-     Public method
+     Message send to server
      */
     public boolean signup(String username, String password) {
         return send(new Message(Message.EClient.SIGNUP, username, password));

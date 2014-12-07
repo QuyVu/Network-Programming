@@ -13,15 +13,18 @@
 #include "message.h"
 #include "server.h"
 
+/*
+ * send contents with n fields to client
+ */
 #define SEND(fields, contents) \
     bzero(buffer, SERVER_BUFFER_LENGTH);\
     strcpy(buffer, message_serializing(fields, contents));\
     send(sock, buffer, strlen(buffer) + 1, 0);\
 
-int number_of_clients = 0;
-ClientNode clients[SERVER_MAX_CONNECTION];
+int number_of_clients = 0; // number of connected users 
+ClientNode clients[SERVER_MAX_CONNECTION]; //an array store name & socket of connected users
 
-static void* thread_proc(void *);
+static void* thread_handler(void *);
 static BOOLEAN on_signup(int, const char*, const char*);
 static BOOLEAN on_login(int, const char*, const char*);
 static BOOLEAN on_logout(int sock, const char*);
@@ -34,7 +37,10 @@ static void insert_client(const char*, int);
 static void remove_client(const char*);
 static int find_client(const char*);
 
-static void* thread_proc(void *arg) {
+/*
+ * Initialize handler for thread procedure 
+ */
+static void* thread_handler(void *arg) {
     int listensock, sock;
     int nread;
 
@@ -43,7 +49,6 @@ static void* thread_proc(void *arg) {
     while (1) {
         sock = accept(listensock, NULL, NULL);
         printf(TEXT_INFO "Client sock %i CONNECTED to child thread %ld with pid %i.\n" TEXT_NORMAL, sock, pthread_self(), getpid());
-        // TODO: notify client CONNECT_SUCCESS
         while (1) {
             char buffer[SERVER_BUFFER_LENGTH];
             nread = recv(sock, buffer, SERVER_BUFFER_LENGTH, 0);
@@ -51,7 +56,8 @@ static void* thread_proc(void *arg) {
                 data_close(sock);
                 break;
             }
-
+            
+            //analyze message from client
             buffer[nread] = '\0';
             if (strlen(buffer) > 0) {
                 printf(TEXT_SUCCESS "Sock(%i) Read(%i): '%s'\n" TEXT_NORMAL, sock, nread, buffer);
@@ -151,7 +157,7 @@ static BOOLEAN on_quit(int sock) {
 }
 
 /*
- * Others
+ * send list users to client
  */
 static void notify_listuser() {
 
@@ -185,6 +191,7 @@ static char** create_contents(int fields, ...) {
     return contents;
 }
 
+//insert new loged in user to array
 static void insert_client(const char *username, int sock) {
     ClientNode clientNode;
     clientNode.username = strdup(username);
@@ -192,6 +199,7 @@ static void insert_client(const char *username, int sock) {
     clients[number_of_clients++] = clientNode;
 }
 
+//remove loged out user from array
 static void remove_client(const char *username) {
     int pos = find_client(username);
     int i;
@@ -201,6 +209,7 @@ static void remove_client(const char *username) {
     number_of_clients--;
 }
 
+//find specific user
 static int find_client(const char *username) {
     int i;
     for (i = 0; i <= number_of_clients - 1; i++) {
@@ -245,7 +254,7 @@ int main(int argc, char *argv[]) {
     int i;
     pthread_t thread_id;
     for (i = 0; i < SERVER_MAX_CONNECTION; i++) {
-        result = pthread_create(&thread_id, NULL, thread_proc, (void*) (intptr_t) listenfd);
+        result = pthread_create(&thread_id, NULL, thread_handler, (void*) (intptr_t) listenfd);
         if (result != 0) {
             printf(TEXT_ERROR "Cannot create thread.\n" TEXT_NORMAL);
             exit(EXIT_FAILURE);
