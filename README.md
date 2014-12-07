@@ -3,9 +3,9 @@ Network-Programming
 
 This is final term project of Network Programming
 
-CLient project is stored in "ChatClient" folder
+###Chat cLient use Java jdk8 
   This project is created by using Netbeans.
   
-Server is stored in folder "Server"
+###Server project use C programming language.
 
-Database is stored in "Server/database"
+###Database use SQLlite and stored in "Server/database".
