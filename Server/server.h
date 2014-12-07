@@ -9,6 +9,11 @@ extern "C" {
 #define SERVER_MAX_CONNECTION              10
 #define SERVER_BUFFER_LENGTH               100
 
+    typedef struct ClientNode {
+        char *username;
+        int sock;
+    } ClientNode;
+
 #ifdef	__cplusplus
 }
 #endif

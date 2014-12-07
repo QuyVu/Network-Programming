@@ -39,9 +39,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/global.o \
 	${OBJECTDIR}/message.o \
 	${OBJECTDIR}/parson.o \
-	${OBJECTDIR}/server.o \
-	${OBJECTDIR}/tree.o \
-	${OBJECTDIR}/value.o
+	${OBJECTDIR}/server.o
 
 
 # C Compiler Flags
@@ -92,16 +90,6 @@ ${OBJECTDIR}/server.o: server.c
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.c) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/server.o server.c
-
-${OBJECTDIR}/tree.o: tree.c 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.c) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/tree.o tree.c
-
-${OBJECTDIR}/value.o: value.c 
-	${MKDIR} -p ${OBJECTDIR}
-	${RM} "$@.d"
-	$(COMPILE.c) -g -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/value.o value.c
 
 # Subprojects
 .build-subprojects:

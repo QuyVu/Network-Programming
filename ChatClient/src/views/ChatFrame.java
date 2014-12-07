@@ -291,16 +291,16 @@ public class ChatFrame extends JFrame {
     private void displayNotification(Color color, String notification) {
         labelNotification.setText(notification);
         labelNotification.setForeground(color);
-        new Timer(5000, (event) -> {
+        new Timer(3000, (event) -> {
             labelNotification.setText(" ");
         }).start();
     }
 
     public void showChat() {
-        try {
+        /*try {
             javax.swing.UIManager.setLookAndFeel(javax.swing.UIManager.getSystemLookAndFeelClassName());
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException ex) {
-        }
+        }*/
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> {

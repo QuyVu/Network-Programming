@@ -9,8 +9,6 @@
       <itemPath>message.h</itemPath>
       <itemPath>parson.h</itemPath>
       <itemPath>server.h</itemPath>
-      <itemPath>tree.h</itemPath>
-      <itemPath>value.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles"
                    displayName="Resource Files"
@@ -24,8 +22,6 @@
       <itemPath>message.c</itemPath>
       <itemPath>parson.c</itemPath>
       <itemPath>server.c</itemPath>
-      <itemPath>tree.c</itemPath>
-      <itemPath>value.c</itemPath>
     </logicalFolder>
     <logicalFolder name="TestFiles"
                    displayName="Test Files"
@@ -76,14 +72,6 @@
       </item>
       <item path="server.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="tree.c" ex="false" tool="0" flavor2="0">
-      </item>
-      <item path="tree.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="value.c" ex="false" tool="0" flavor2="0">
-      </item>
-      <item path="value.h" ex="false" tool="3" flavor2="0">
-      </item>
     </conf>
     <conf name="Release" type="1">
       <toolsSet>
@@ -124,14 +112,6 @@
       <item path="server.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="server.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="tree.c" ex="false" tool="0" flavor2="0">
-      </item>
-      <item path="tree.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="value.c" ex="false" tool="0" flavor2="0">
-      </item>
-      <item path="value.h" ex="false" tool="3" flavor2="0">
       </item>
     </conf>
   </confs>

@@ -194,7 +194,7 @@ public final class Client implements Runnable {
         }
     }
 
-    private enum Text {
+    public enum Text {
 
         NORMAL("\u001B[0m"),
         ERROR("\u001B[31m"),

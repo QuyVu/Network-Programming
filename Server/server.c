@@ -11,7 +11,6 @@
 #include "global.h"
 #include "data.h"
 #include "message.h"
-#include "tree.h"
 #include "server.h"
 
 #define SEND(fields, contents) \
@@ -19,8 +18,8 @@
     strcpy(buffer, message_serializing(fields, contents));\
     send(sock, buffer, strlen(buffer) + 1, 0);\
 
-// tree structure: key - username, value - sock address
-Tree clients;
+int number_of_clients = 0;
+ClientNode clients[SERVER_MAX_CONNECTION];
 
 static void* thread_proc(void *);
 static BOOLEAN on_signup(int, const char*, const char*);
@@ -30,6 +29,10 @@ static BOOLEAN on_send(const char*, const char*, const char*);
 static BOOLEAN on_quit(int);
 static void notify_listuser();
 static char** create_contents(int, ...);
+
+static void insert_client(const char*, int);
+static void remove_client(const char*);
+static int find_client(const char*);
 
 static void* thread_proc(void *arg) {
     int listensock, sock;
@@ -85,7 +88,7 @@ static BOOLEAN on_signup(int sock, const char *name, const char *password) {
         BOOLEAN res = data_add_user(name, password);
         if (res) {
             SEND(1, create_contents(1, Message[SERVER_SIGNUP_SUCCESS]));
-            tree_insert_str(clients, (char*) name, new_val_i(sock));
+            insert_client(name, sock);
             SEND(1, create_contents(1, Message[SERVER_LOGIN_SUCCESS]));
             notify_listuser();
         } else {
@@ -100,8 +103,8 @@ static BOOLEAN on_login(int sock, const char *name, const char *password) {
     char *p = data_get_password(name);
     if (p != NULL) {
         if (strcmp(p, password) == 0) {
-            if (tree_find_str(clients, (char*) name) == NULL) {
-                tree_insert_str(clients, (char*) name, new_val_i(sock));
+            if (find_client(name) < 0) {
+                insert_client(name, sock);
                 SEND(1, create_contents(1, Message[SERVER_LOGIN_SUCCESS]));
                 notify_listuser();
                 return TRUE;
@@ -124,9 +127,7 @@ static BOOLEAN on_login(int sock, const char *name, const char *password) {
 
 static BOOLEAN on_logout(int sock, const char *name) {
     char buffer[SERVER_BUFFER_LENGTH];
-    Tree client = tree_find_str(clients, (char*) name);
-    if (client != NULL)
-        tree_delete_node(client);
+    remove_client(name);
     SEND(1, create_contents(1, Message[SERVER_LOGOUT_SUCCESS]));
     notify_listuser();
 
@@ -136,9 +137,9 @@ static BOOLEAN on_logout(int sock, const char *name) {
 static BOOLEAN on_send(const char *sender, const char *recipient, const char *message) {
     char buffer[SERVER_BUFFER_LENGTH];
     int sock;
-    sock = val_i(tree_val(tree_find_str(clients, (char*) sender)));
+    sock = clients[find_client(sender)].sock;
     SEND(4, create_contents(4, Message[SERVER_RECEIVE], sender, recipient, message));
-    sock = val_i(tree_val(tree_find_str(clients, (char*) recipient)));
+    sock = clients[find_client(recipient)].sock;
     SEND(4, create_contents(4, Message[SERVER_RECEIVE], sender, recipient, message));
 
     return TRUE;
@@ -154,21 +155,19 @@ static BOOLEAN on_quit(int sock) {
  */
 static void notify_listuser() {
 
-    Tree c;
-    char* listuser[SERVER_MAX_CONNECTION];
+    char* listuser[SERVER_MAX_CONNECTION + 1];
     listuser[0] = (char*) Message[SERVER_INFO_LISTUSER];
-    int i = 1;
+    int i;
 
-    TREE_TRAVERSE(c, clients) {
+    for (i = 1; i <= number_of_clients; i++)
+        listuser[i] = clients[i - 1].username;
 
-        listuser[i++] = val_s(c->key);
-    }
 
     char buffer[SERVER_BUFFER_LENGTH];
 
-    TREE_TRAVERSE(c, clients) {
-        int sock = val_i(tree_val(c));
-        SEND(i, listuser);
+    for (i = 0; i <= number_of_clients - 1; i++) {
+        int sock = clients[i].sock;
+        SEND(number_of_clients + 1, listuser);
     }
 }
 
@@ -186,6 +185,31 @@ static char** create_contents(int fields, ...) {
     return contents;
 }
 
+static void insert_client(const char *username, int sock) {
+    ClientNode clientNode;
+    clientNode.username = strdup(username);
+    clientNode.sock = sock;
+    clients[number_of_clients++] = clientNode;
+}
+
+static void remove_client(const char *username) {
+    int pos = find_client(username);
+    int i;
+    for (i = pos; i <= number_of_clients - 2; i++) {
+        clients[i] = clients[i + 1];
+    }
+    number_of_clients--;
+}
+
+static int find_client(const char *username) {
+    int i;
+    for (i = 0; i <= number_of_clients - 1; i++) {
+        if (strcmp(username, clients[i].username) == 0)
+            return i;
+    }
+    return -1;
+}
+
 int main(int argc, char *argv[]) {
     int port = 6000;
     int val = 1;
@@ -198,7 +222,7 @@ int main(int argc, char *argv[]) {
         printf(TEXT_ERROR "Cannot set socket options\n" TEXT_NORMAL);
         exit(EXIT_FAILURE);
     }
-       
+
     struct sockaddr_in sevraddr;
     sevraddr.sin_family = AF_INET;
     sevraddr.sin_port = htons(port);
@@ -217,8 +241,7 @@ int main(int argc, char *argv[]) {
     }
 
     data_open();
-    clients = tree_make();
-    
+
     int i;
     pthread_t thread_id;
     for (i = 0; i < SERVER_MAX_CONNECTION; i++) {
