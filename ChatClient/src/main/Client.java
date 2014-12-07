@@ -26,7 +26,7 @@ public final class Client implements Runnable {
     private Consumer<String[]> loginFailure;
     private Consumer<String[]> logoutSuccess;
     private Consumer<String[]> receive;
-    private Consumer<String[]> infoListuser;
+    private Consumer<String[]> listingUser;
 
     /*
      Constructor
@@ -65,8 +65,8 @@ public final class Client implements Runnable {
         this.receive = receive;
     }
 
-    public void onInfoListuser(Consumer<String[]> infoListuser) {
-        this.infoListuser = infoListuser;
+    public void onListingUser(Consumer<String[]> listingUser) {
+        this.listingUser = listingUser;
     }
 
     /*
@@ -187,8 +187,8 @@ public final class Client implements Runnable {
                     logoutSuccess.accept(params);
                 } else if (type.equals(Message.Server.RECEIVE.toString()) && receive != null) {
                     receive.accept(params);
-                } else if (type.equals(Message.Server.INFO_LISTUSER.toString()) && infoListuser != null) {
-                    infoListuser.accept(params);
+                } else if (type.equals(Message.Server.INFO_LISTUSER.toString()) && listingUser != null) {
+                    listingUser.accept(params);
                 }
             }
         } catch (IOException | ParseException ex) {

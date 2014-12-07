@@ -19,7 +19,7 @@ extern "C" {
         SERVER_LOGIN_FAILURE,
         SERVER_LOGOUT_SUCCESS,
         SERVER_RECEIVE,
-        SERVER_INFO_LISTUSER
+        SERVER_LISTING_USER
     } MESSAGE;
 
     static const char* Message[] = {"SIGNUP", "LOGIN", "LOGOUT", "SEND", "QUIT",

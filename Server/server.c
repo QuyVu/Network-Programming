@@ -162,7 +162,7 @@ static BOOLEAN on_quit(int sock) {
 static void notify_listuser() {
 
     char* listuser[SERVER_MAX_CONNECTION + 1];
-    listuser[0] = (char*) Message[SERVER_INFO_LISTUSER];
+    listuser[0] = (char*) Message[SERVER_LISTING_USER];
     int i;
 
     for (i = 1; i <= number_of_clients; i++)

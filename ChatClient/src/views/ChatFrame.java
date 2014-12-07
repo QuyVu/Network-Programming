@@ -34,8 +34,8 @@ public class ChatFrame extends JFrame {
         client.onReceive((params) -> {
             receive(params);
         });
-        client.onInfoListuser((params) -> {
-            infoListuser(params);
+        client.onListingUser((params) -> {
+            listingUser(params);
         });
         this.addWindowListener(new WindowListener() {
 
@@ -259,7 +259,7 @@ public class ChatFrame extends JFrame {
             client.send(loginFrame.logedUser, listUser.getSelectedValue().toString(),
                     textMessage.getText());
             textMessage.setText(" ");
-        } else labelNotification.setText("You must chose some one first!");
+        } else displayNotification(Color.RED,"You must chose some one first!");
     }//GEN-LAST:event_buttonSendActionPerformed
 
     //handle log out button click
@@ -280,7 +280,7 @@ public class ChatFrame extends JFrame {
     }
     
     //get list of users that you can chat with
-    private void infoListuser(String[] params) {
+    private void listingUser(String[] params) {
         modelUser.clear();
         for (String param : params) {
             if (param != null && !param.equals(loginFrame.logedUser)) {
