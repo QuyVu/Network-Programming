@@ -18,7 +18,7 @@
  */
 #define SEND(fields, contents) \
     bzero(buffer, SERVER_BUFFER_LENGTH);\
-    strcpy(buffer, message_serializing(fields, contents));\
+    strcpy(buffer, pack_message(fields, contents));\
     send(sock, buffer, strlen(buffer) + 1, 0);\
 
 int number_of_clients = 0; // number of connected users 
@@ -30,7 +30,7 @@ static BOOLEAN on_login(int, const char*, const char*);
 static BOOLEAN on_logout(int sock, const char*);
 static BOOLEAN on_send(const char*, const char*, const char*);
 static BOOLEAN on_quit(int);
-static void notify_listuser();
+static void send_listuser();
 static char** create_contents(int, ...);
 
 static void insert_client(const char*, int);
@@ -48,20 +48,20 @@ static void* thread_handler(void *arg) {
 
     while (1) {
         sock = accept(listensock, NULL, NULL);
-        printf(TEXT_INFO "Client sock %i CONNECTED to child thread %ld with pid %i.\n" TEXT_NORMAL, sock, pthread_self(), getpid());
+        printf(TEXT_INFO "Client sock %i CONNECTED to child thread %ld with pid %i.\n", sock, pthread_self(), getpid());
         while (1) {
             char buffer[SERVER_BUFFER_LENGTH];
             nread = recv(sock, buffer, SERVER_BUFFER_LENGTH, 0);
             if (nread < 0) {
-                data_close(sock);
+                close_db(sock);
                 break;
             }
             
             //analyze message from client
             buffer[nread] = '\0';
             if (strlen(buffer) > 0) {
-                printf(TEXT_SUCCESS "Sock(%i) Read(%i): '%s'\n" TEXT_NORMAL, sock, nread, buffer);
-                char **contents = message_deserializing(buffer);
+                printf(TEXT_SUCCESS "Sock(%i) Read(%i): '%s'\n", sock, nread, buffer);
+                char **contents = unpack_message(buffer);
                 if (strcmp(contents[0], Message[CLIENT_SIGNUP]) == 0) {
                     on_signup(sock, contents[1], contents[2]);
                 } else if (strcmp(contents[0], Message[CLIENT_LOGIN]) == 0) {
@@ -77,7 +77,7 @@ static void* thread_handler(void *arg) {
                 }
             }
         }
-        printf(TEXT_INFO "Client sock %i DISCONNECTED from child thread %ld with pid %i.\n" TEXT_NORMAL, sock, pthread_self(), getpid());
+        printf(TEXT_INFO "Client sock %i DISCONNECTED from child thread %ld with pid %i.\n", sock, pthread_self(), getpid());
     }
 }
 
@@ -86,17 +86,17 @@ static void* thread_handler(void *arg) {
  */
 static BOOLEAN on_signup(int sock, const char *name, const char *password) {
     char buffer[SERVER_BUFFER_LENGTH];
-    if (data_get_password(name) != NULL) {
+    if (get_password(name) != NULL) {
         SEND(2, create_contents(2,
                 (char*) Message[SERVER_SIGNUP_FAILURE], "Username already exists"));
         return FALSE;
     } else {
-        BOOLEAN res = data_add_user(name, password);
+        BOOLEAN res = add_user(name, password);
         if (res) {
             SEND(1, create_contents(1, Message[SERVER_SIGNUP_SUCCESS]));
             insert_client(name, sock);
             SEND(1, create_contents(1, Message[SERVER_LOGIN_SUCCESS]));
-            notify_listuser();
+            send_listuser();
         } else {
             SEND(1, create_contents(1, Message[SERVER_SIGNUP_FAILURE]));
         }
@@ -106,13 +106,13 @@ static BOOLEAN on_signup(int sock, const char *name, const char *password) {
 
 static BOOLEAN on_login(int sock, const char *name, const char *password) {
     char buffer[SERVER_BUFFER_LENGTH];
-    char *p = data_get_password(name);
+    char *p = get_password(name);
     if (p != NULL) {
         if (strcmp(p, password) == 0) {
             if (find_client(name) < 0) {
                 insert_client(name, sock);
                 SEND(1, create_contents(1, Message[SERVER_LOGIN_SUCCESS]));
-                notify_listuser();
+                send_listuser();
                 return TRUE;
             } else {
                 SEND(2, create_contents(2, Message[SERVER_LOGIN_FAILURE], "User has logged in"));
@@ -135,7 +135,7 @@ static BOOLEAN on_logout(int sock, const char *name) {
     char buffer[SERVER_BUFFER_LENGTH];
     remove_client(name);
     SEND(1, create_contents(1, Message[SERVER_LOGOUT_SUCCESS]));
-    notify_listuser();
+    send_listuser();
 
     return TRUE;
 }
@@ -159,7 +159,7 @@ static BOOLEAN on_quit(int sock) {
 /*
  * send list users to client
  */
-static void notify_listuser() {
+static void send_listuser() {
 
     char* listuser[SERVER_MAX_CONNECTION + 1];
     listuser[0] = (char*) Message[SERVER_LISTING_USER];
@@ -224,11 +224,11 @@ int main(int argc, char *argv[]) {
     int val = 1;
     int result;
     int listenfd;
-    printf(TEXT_SUCCESS "Server Init Successful\n" TEXT_NORMAL);
+    printf(TEXT_SUCCESS "Server Init Successful\n");
     listenfd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     result = setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR, &val, sizeof (val));
     if (result < 0) {
-        printf(TEXT_ERROR "Cannot set socket options\n" TEXT_NORMAL);
+        printf(TEXT_ERROR "Cannot set socket options\n");
         exit(EXIT_FAILURE);
     }
 
@@ -239,24 +239,24 @@ int main(int argc, char *argv[]) {
 
     result = bind(listenfd, (struct sockaddr *) &sevraddr, sizeof (sevraddr));
     if (result < 0) {
-        printf(TEXT_ERROR "Binding fail\n" TEXT_NORMAL);
+        printf(TEXT_ERROR "Binding fail\n");
         exit(EXIT_FAILURE);
     }
 
     result = listen(listenfd, SERVER_MAX_REQUESTS);
     if (result < 0) {
-        printf(TEXT_ERROR "Cannot accept connection\n" TEXT_NORMAL);
+        printf(TEXT_ERROR "Cannot connect\n");
         exit(EXIT_FAILURE);
     }
 
-    data_open();
+    open_db();
 
     int i;
     pthread_t thread_id;
     for (i = 0; i < SERVER_MAX_CONNECTION; i++) {
         result = pthread_create(&thread_id, NULL, thread_handler, (void*) (intptr_t) listenfd);
         if (result != 0) {
-            printf(TEXT_ERROR "Cannot create thread.\n" TEXT_NORMAL);
+            printf(TEXT_ERROR "Cannot create thread.\n");
             exit(EXIT_FAILURE);
         }
         sched_yield();

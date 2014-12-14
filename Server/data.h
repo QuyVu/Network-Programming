@@ -12,10 +12,10 @@ extern "C" {
 
 sqlite3 *chat_database;
 
-BOOLEAN data_open();
-BOOLEAN data_add_user(const char*, const char*);
-char* data_get_password(const char*);
-void data_close();
+BOOLEAN open_db();
+BOOLEAN add_user(const char*, const char*);
+char* get_password(const char*);
+void close_db();
 
 #ifdef	__cplusplus
 }

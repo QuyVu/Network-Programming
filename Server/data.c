@@ -4,9 +4,9 @@
 #include "global.h"
 #include "data.h"
 
-static void init();
+static void create_db();
 
-BOOLEAN data_open() {
+BOOLEAN open_db() {
     int rc;
     rc = sqlite3_open(DATA_PATH, &chat_database);
 
@@ -14,12 +14,12 @@ BOOLEAN data_open() {
         printf(TEXT_ERROR "Can not open database: %s\n", sqlite3_errmsg(chat_database));
         return FALSE;
     } else {
-        init();
+        create_db();
         return TRUE;
     }
 }
 
-BOOLEAN data_add_user(const char *name, const char *password) {
+BOOLEAN add_user(const char *name, const char *password) {
     char *message = 0;
     int rc;
     char *sql = (char*) malloc(sizeof (char) * DATA_SQL_LENGTH);
@@ -36,7 +36,7 @@ BOOLEAN data_add_user(const char *name, const char *password) {
     }
 }
 
-char* data_get_password(const char *name) {
+char* get_password(const char *name) {
     char *message = 0;
     int rc;
     char *sql = (char*) malloc(sizeof (char) * DATA_SQL_LENGTH);
@@ -62,7 +62,7 @@ char* data_get_password(const char *name) {
     }
 }
 
-void data_close() {
+void close_db() {
     sqlite3_close(chat_database);
 }
 
@@ -70,7 +70,7 @@ void data_close() {
  * Private functions
  */
 
-static void init() {
+static void create_db() {
     char *sql;
     char *message = 0;
 

@@ -3,7 +3,7 @@
 #include "parson.h"
 #include "message.h"
 
-char** message_deserializing(char *message) {
+char** unpack_message(char *message) {
     JSON_Value *value = json_parse_string(message);
     JSON_Array *array = json_array(value);
     int fields = json_array_get_count(array);
@@ -16,7 +16,7 @@ char** message_deserializing(char *message) {
     return contents;
 }
 
-char* message_serializing(int fields, char* contents[]) {
+char* pack_message(int fields, char* contents[]) {
     if (fields == 0) return NULL;
 
     JSON_Value *values = json_value_init_array();

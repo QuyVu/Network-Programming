@@ -2,7 +2,6 @@ package views;
 
 import java.awt.Color;
 import javax.swing.Timer;
-import javax.swing.UnsupportedLookAndFeelException;
 import main.Client;
 
 public class LoginFrame extends javax.swing.JFrame {

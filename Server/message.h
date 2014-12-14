@@ -26,8 +26,8 @@ extern "C" {
         "SIGNUP_SUCCESS", "SIGNUP_FAILURE", "LOGIN_SUCCESS", "LOGIN_FAILURE", "LOGOUT_SUCCESS",
         "RECEIVE", "INFO_LISTUSER"};
 
-    char** message_deserializing(char*);
-    char* message_serializing(int, char*[]);
+    char** unpack_message(char*);
+    char* pack_message(int, char*[]);
 
 #ifdef	__cplusplus
 }

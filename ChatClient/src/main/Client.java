@@ -96,10 +96,10 @@ public final class Client implements Runnable {
         try {
             socket = new Socket(host, port);
             System.out.println(Text.SUCCESS
-                    + "Just connected to " + socket.getRemoteSocketAddress() + Text.NORMAL);
+                    + "Just connected to " + socket.getRemoteSocketAddress());
             return true;
         } catch (IOException ex) {
-            System.out.println(Text.ERROR + "Cannot connect to: " + host + ":" + port + Text.NORMAL);
+            System.out.println(Text.ERROR + "Cannot connect to: " + host + ":" + port);
             return false;
         }
     }
@@ -152,6 +152,7 @@ public final class Client implements Runnable {
         BufferedReader in;
         char buffer[] = new char[CLIENT_BUFFER_LENGTH];
         try {
+            if (socket != null){
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
             Arrays.fill(buffer, '\0');
@@ -190,6 +191,7 @@ public final class Client implements Runnable {
                 } else if (type.equals(Message.Server.INFO_LISTUSER.toString()) && listingUser != null) {
                     listingUser.accept(params);
                 }
+            }
             }
         } catch (IOException | ParseException ex) {
             ex.printStackTrace();
